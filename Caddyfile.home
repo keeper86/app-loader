@@ -1,0 +1,4 @@
+polysim.work {
+    root * /srv
+    file_server
+}
