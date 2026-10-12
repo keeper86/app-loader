@@ -1,0 +1,9 @@
+services:
+    # The pinned haproxy image (3.4.6) runs as uid 99 ("haproxy") and the host has
+    # net.ipv4.ip_unprivileged_port_start=1024, so :80/:443 need root (cap_add alone
+    # does not grant effective capabilities to a non-root container user).
+    haproxy:
+        user: root
+    home:
+        volumes:
+            - ./Caddyfile.home.smoke:/etc/caddy/Caddyfile

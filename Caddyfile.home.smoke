@@ -1,0 +1,8 @@
+{
+    local_certs
+}
+
+polysim.work {
+    root * /srv
+    file_server
+}
