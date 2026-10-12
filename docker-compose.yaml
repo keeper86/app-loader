@@ -1,9 +1,16 @@
 services:
     haproxy:
-        image: haproxy:lts-alpine
+        # Pin the minor version: the floating "lts-alpine" tag silently changed the
+        # default user (now uid 99), which broke binding :80/:443. See README.
+        image: haproxy:3.4-alpine
         container_name: app-loader-haproxy
         network_mode: host
         restart: unless-stopped
+        # The image defaults to user "haproxy" (uid 99), which cannot bind the
+        # privileged ports :80/:443 on a host with the default
+        # net.ipv4.ip_unprivileged_port_start=1024. Start as root to bind them;
+        # haproxy then drops its workers to "haproxy" (see haproxy.cfg).
+        user: root
         volumes:
             - ./haproxy.cfg:/usr/local/etc/haproxy/haproxy.cfg:ro
 

@@ -37,3 +37,36 @@ docker compose up -d
 4. Add the DNS records for `<app>.polysim.work` and `auth.<app>.polysim.work`.
 
 Standalone, an app leaves `CADDY_*_BIND` unset and binds 80/443 itself.
+
+## Production notes
+
+### Binding the privileged ports
+
+`haproxy:3.4-alpine` defaults to the unprivileged user `haproxy` (uid 99). On a host with the
+usual `net.ipv4.ip_unprivileged_port_start=1024` that user cannot bind `:80`/`:443`, so the
+compose file runs the container as `root`; `haproxy` then drops its workers to the `haproxy`
+user (see the `global` section of `haproxy.cfg`).
+
+Alternatives, if you never want the container to run as root:
+
+- build a small image that sets `cap_net_bind_service+ep` on the `haproxy` binary, or
+- lower the host's `net.ipv4.ip_unprivileged_port_start` (host-wide; affects every user).
+
+Do **not** rely on `cap_add: NET_BIND_SERVICE` — Docker does not grant effective capabilities
+to a non-root container user.
+
+### Cloudflare
+
+The edge is pure TLS passthrough, so the Cloudflare proxy mode per record matters:
+
+- **DNS-only (grey cloud)** — clients connect straight to this host; haproxy sees the real
+  SNI and each app terminates TLS with its own Let's Encrypt certificate. Simplest and the
+  most robust for ACME. Recommended while certificates are issued.
+- **Proxied (orange cloud)** — Cloudflare terminates the client TLS and re-originates to the
+  edge. This only works with SSL/TLS mode **Full (strict)** (Cloudflare validates the app's
+  certificate against the hostname). Caveats:
+  - Caddy's preferred `tls-alpn-01` challenge never reaches the origin through Cloudflare, so
+    issuance falls back to `http-01` via the edge's `:80`; Cloudflare's *Always Use HTTPS* can
+    interfere. Issue certificates with the records **grey**, then switch to **orange**.
+  - The robust way to run ACME behind Cloudflare is the **DNS-01** challenge, e.g.
+    `tls { dns cloudflare {env.CLOUDFLARE_API_TOKEN} }` in each app's Caddyfile.
