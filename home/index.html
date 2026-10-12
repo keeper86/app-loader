@@ -4,16 +4,213 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Polysim</title>
+        <meta name="description" content="Polysim - choose an application." />
+        <meta name="theme-color" content="#f5f7fb" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#0a0e17" media="(prefers-color-scheme: dark)" />
+        <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232b6cff'/%3E%3Cpath d='M7 20.5c4.5 0 4.5-9 9-9s4.5 9 9 9' fill='none' stroke='white' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E" />
+        <style>
+            :root {
+                --bg: #f5f7fb;
+                --panel: #ffffff;
+                --text: #0e1424;
+                --muted: #5b6478;
+                --border: #e6eaf2;
+                --accent: #2b6cff;
+                --glow: rgba(43, 108, 255, 0.12);
+                --shadow: 0 1px 2px rgba(16, 24, 40, 0.06), 0 18px 40px -18px rgba(16, 24, 40, 0.25);
+                --radius: 16px;
+            }
+            @media (prefers-color-scheme: dark) {
+                :root {
+                    --bg: #0a0e17;
+                    --panel: #111726;
+                    --text: #eef2fa;
+                    --muted: #98a2b8;
+                    --border: #1e2637;
+                    --accent: #7aa2ff;
+                    --glow: rgba(122, 162, 255, 0.14);
+                    --shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 24px 48px -22px rgba(0, 0, 0, 0.75);
+                }
+            }
+            * {
+                box-sizing: border-box;
+            }
+            body {
+                margin: 0;
+                min-height: 100dvh;
+                display: grid;
+                place-items: center;
+                padding: 40px 20px;
+                color: var(--text);
+                background-color: var(--bg);
+                background-image: radial-gradient(1100px 520px at 50% -12%, var(--glow), transparent 68%);
+                font: 16px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Inter, Helvetica, Arial, sans-serif;
+                -webkit-font-smoothing: antialiased;
+                text-rendering: optimizeLegibility;
+            }
+            .wrap {
+                width: 100%;
+                max-width: 940px;
+            }
+            header {
+                text-align: center;
+                margin-bottom: 34px;
+            }
+            .brand {
+                display: inline-flex;
+                align-items: center;
+                gap: 12px;
+                font-weight: 800;
+                letter-spacing: -0.02em;
+                font-size: clamp(30px, 5vw, 42px);
+            }
+            .brand svg {
+                width: 1.05em;
+                height: 1.05em;
+                color: var(--accent);
+            }
+            .tagline {
+                margin: 10px 0 0;
+                color: var(--muted);
+                font-size: clamp(15px, 2.2vw, 17px);
+            }
+            .apps {
+                display: grid;
+                gap: 16px;
+                grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+                list-style: none;
+                margin: 0;
+                padding: 0;
+            }
+            .card {
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                height: 100%;
+                padding: 22px;
+                overflow: hidden;
+                color: inherit;
+                text-decoration: none;
+                background: var(--panel);
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                box-shadow: var(--shadow);
+                transition: transform 0.18s ease, border-color 0.18s ease;
+            }
+            .card::before {
+                content: "";
+                position: absolute;
+                inset: 0 auto 0 0;
+                width: 4px;
+                background: var(--accent);
+                opacity: 0;
+                transition: opacity 0.18s ease;
+            }
+            .card:hover {
+                transform: translateY(-3px);
+                border-color: var(--accent);
+            }
+            .card:hover::before {
+                opacity: 1;
+            }
+            .card:focus-visible {
+                outline: 3px solid var(--accent);
+                outline-offset: 2px;
+            }
+            .name {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                font-size: 19px;
+                font-weight: 700;
+                letter-spacing: -0.01em;
+            }
+            .desc {
+                margin: 0;
+                color: var(--muted);
+                font-size: 14.5px;
+            }
+            .open {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                margin-top: auto;
+                padding-top: 16px;
+                color: var(--accent);
+                font-size: 13.5px;
+                font-weight: 600;
+            }
+            .open svg {
+                width: 15px;
+                height: 15px;
+                transition: transform 0.18s ease;
+            }
+            .card:hover .open svg {
+                transform: translateX(3px);
+            }
+            footer {
+                margin-top: 34px;
+                text-align: center;
+                color: var(--muted);
+                font-size: 13px;
+            }
+            @media (prefers-reduced-motion: reduce) {
+                .card,
+                .open svg,
+                .card::before {
+                    transition: none;
+                }
+                .card:hover {
+                    transform: none;
+                }
+            }
+        </style>
     </head>
     <body>
-        <main>
-            <h1>Polysim</h1>
-            <p>Choose an application:</p>
-            <ul>
-                <li><a href="https://yawa.polysim.work">Yawa</a></li>
-                <li><a href="https://app.polysim.work">Polysim</a></li>
-                <li><a href="https://enterprise-engine.polysim.work">Enterprise Engine</a></li>
+        <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+            <symbol id="arrow" viewBox="0 0 24 24">
+                <path d="M5 12h14M13 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </symbol>
+        </svg>
+
+        <main class="wrap">
+            <header>
+                <div class="brand">
+                    <svg viewBox="0 0 32 32" aria-hidden="true">
+                        <rect width="32" height="32" rx="8" fill="currentColor" opacity="0.14" />
+                        <path d="M7 20.5c4.5 0 4.5-9 9-9s4.5 9 9 9" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" />
+                    </svg>
+                    Polysim
+                </div>
+                <p class="tagline">Choose an application to continue.</p>
+            </header>
+
+            <ul class="apps">
+                <li>
+                    <a class="card" href="https://app.polysim.work" rel="noopener">
+                        <span class="name">Polysim</span>
+                        <p class="desc">Governance for provenance.</p>
+                        <span class="open">Open <svg aria-hidden="true"><use href="#arrow" /></svg></span>
+                    </a>
+                </li>
+                <li>
+                    <a class="card" href="https://enterprise-engine.polysim.work" rel="noopener">
+                        <span class="name">Enterprise Engine</span>
+                        <p class="desc">Economic simulation engine.</p>
+                        <span class="open">Open <svg aria-hidden="true"><use href="#arrow" /></svg></span>
+                    </a>
+                </li>
+                <li>
+                    <a class="card" href="https://yawa.polysim.work" rel="noopener">
+                        <span class="name">Yawa</span>
+                        <p class="desc">Application platform.</p>
+                        <span class="open">Open <svg aria-hidden="true"><use href="#arrow" /></svg></span>
+                    </a>
+                </li>
             </ul>
+
+            <footer>polysim.work</footer>
         </main>
     </body>
 </html>
